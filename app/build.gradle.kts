@@ -1,13 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
-    id("kotlin-parcelize")
-    id("com.google.gms.google-services")
-
 }
-
 
 android {
     namespace = "com.example.voice_moderation"
@@ -46,7 +40,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.4"
+        kotlinCompilerExtensionVersion = "1.5.1"
     }
     packaging {
         resources {
@@ -65,43 +59,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-
-    // Hilt for Dependency Injection
-    implementation(libs.hilt.android)
-    implementation(libs.androidx.media3.common.ktx)
-
-    ksp(libs.hilt.compiler)
-    implementation(libs.androidx.hilt.navigation.compose)
-
-    // OkHttp for WebSocket support
-    implementation(libs.okhttp)
-
-    // Kotlin Coroutines for asynchronous programming
-    implementation(libs.coroutines.core)
-    // ViewModel and Lifecycle
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx.v281)
-
-    implementation(libs.timber)
-
-    implementation(libs.accompanist.permissions)
-
-
-
-
-    // optional - RxJava3 support
-    implementation(libs.androidx.datastore.preferences.rxjava3)
-    implementation(libs.androidx.datastore.core)
-    implementation(libs.androidx.datastore.preferences)
-    implementation(libs.androidx.datastore.preferences.core)
-
-    implementation (libs.retrofit)
-    implementation (libs.converter.gson)
-    implementation(libs.gson)
-    implementation (libs.logging.interceptor)
-
-
-
+    implementation(libs.androidx.benchmark.macro)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -110,17 +68,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation("com.google.android.gms:play-services-cast:21.0.1") // Use the latest version
-    implementation("com.google.android.material:material:1.8.0")
+    implementation ("com.google.android.material:material:1.8.0")
     implementation("androidx.compose.material:material-icons-extended")
-
-
-    // Import the BoM for the Firebase platform
-    implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
-    implementation("com.google.firebase:firebase-auth")
-    implementation("androidx.biometric:biometric:1.1.0") // Use the latest version
-
-
-    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
-    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 }
