@@ -7,6 +7,7 @@ sealed class Screen {
     object SignUp : Screen()
     object TermsAndConditionsScreen : Screen()
     object LoginScreen : Screen()
+    object HomeScreen :Screen()
 }
 
 object HateDetectionAppRouter {
