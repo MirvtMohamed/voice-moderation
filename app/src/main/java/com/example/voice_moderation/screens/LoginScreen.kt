@@ -29,6 +29,8 @@ import com.example.voice_moderation.navigation.Screen
 import com.example.voice_moderation.navigation.SystemBackButtonHandler
 
 
+
+
 @Composable
 fun LoginScreen() {
     Surface(
@@ -41,24 +43,25 @@ fun LoginScreen() {
             NormalTextComponenet(value = stringResource(id = R.string.login))
             HeadingTextComponent(value = stringResource(id = R.string.welcome))
             Spacer(modifier = Modifier.height(20.dp))
-            MyTextFieldComponent(
-                labelValue = stringResource(id = R.string.email), painterResource = painterResource(
-                    id = R.drawable.email
-                )
+            MyTextFieldComponent(labelValue = stringResource(id = R.string.email),
+                painterResource = painterResource(id = R.drawable.email),
+                onTextSelected = {}
             )
 
             PasswordTextFieldComponent(
                 labelValue = stringResource(id = R.string.password),
-                painterResource = painterResource(
-                    id = R.drawable.password
-                )
+                painterResource = painterResource(id = R.drawable.password),
+                onTextSelected = {}
             )
             Spacer(modifier = Modifier.height(40.dp))
 
             UnderLinedTextComponenet(value = stringResource(id = R.string.forgot_password))
             Spacer(modifier = Modifier.height(40.dp))
 
-            ButtonComponent(value = stringResource(id = R.string.login))
+            ButtonComponent(
+                value = stringResource(id =  R.string.login),
+                onButtonClicked = {}
+            )
             Spacer(modifier = Modifier.height(20.dp))
 
             DividerTextComponent()

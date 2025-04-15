@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "75869892392",
+    "project_id": "hatedetectionapp",
+    "storage_bucket": "hatedetectionapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:75869892392:android:153d0f8d8686d5e49eea1d",
+        "android_client_info": {
+          "package_name": "com.example.voice_moderation"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjBIk4_tDfDR3VJmFd6D8-1BwnpCPflxc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

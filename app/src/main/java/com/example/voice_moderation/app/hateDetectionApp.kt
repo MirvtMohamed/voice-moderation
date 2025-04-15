@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.voice_moderation.navigation.HateDetectionAppRouter
 import com.example.voice_moderation.navigation.Screen
+import com.example.voice_moderation.screens.HomeScreen
 import com.example.voice_moderation.screens.LoginScreen
 import com.example.voice_moderation.screens.Signup
 import com.example.voice_moderation.screens.TermsAndConditionsScreen
@@ -30,6 +31,9 @@ fun HateDetectionApp() {
                 }
                 is Screen.LoginScreen ->{
                     LoginScreen()
+                }
+                is Screen.HomeScreen ->{
+                    HomeScreen()
                 }
 
             }}

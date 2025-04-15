@@ -59,6 +59,8 @@ import com.example.voice_moderation.ui.theme.PurpleGrey40
 import androidx.compose.ui.Alignment.Companion as Alignment1
 
 
+
+
 @Composable
 fun NormalTextComponenet(value: String) {
     Text(
@@ -96,7 +98,9 @@ fun HeadingTextComponent(value: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyTextFieldComponent(labelValue: String, painterResource: Painter) {
+fun MyTextFieldComponent(labelValue: String, painterResource: Painter,
+                         onTextSelected: (String) -> Unit,
+                         errorStatus:Boolean= false) {
     val textValue = remember {
         mutableStateOf("")
     }
@@ -119,11 +123,13 @@ fun MyTextFieldComponent(labelValue: String, painterResource: Painter) {
         value = textValue.value,
         onValueChange = {
             textValue.value = it
+            onTextSelected(it)
         },
         leadingIcon = {
             Icon( painter = painterResource, contentDescription ="")
 
-        }
+        },
+        isError = !errorStatus
 
 
     )
@@ -132,7 +138,10 @@ fun MyTextFieldComponent(labelValue: String, painterResource: Painter) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PasswordTextFieldComponent(labelValue: String, painterResource: Painter) {
+fun PasswordTextFieldComponent(labelValue: String, painterResource: Painter,
+                               onTextSelected: (String) -> Unit,
+                               errorStatus:Boolean= false)
+{
     val password = remember {
         mutableStateOf("")
     }
@@ -166,6 +175,7 @@ fun PasswordTextFieldComponent(labelValue: String, painterResource: Painter) {
         value = password.value,
         onValueChange = {
             password.value = it
+            onTextSelected(it)
         },
         leadingIcon = {
             Icon( painter = painterResource, contentDescription ="")
@@ -188,32 +198,37 @@ fun PasswordTextFieldComponent(labelValue: String, painterResource: Painter) {
 
             }
         },
-        visualTransformation = if(passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation()
+        visualTransformation = if(passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
+        isError = !errorStatus
 
     )
 }
 
 
 @Composable
-fun CheckboxComponent(value: String, onTextSelected : (String) -> Unit) {
-    val checkedState = remember { mutableStateOf(false) }
-
+fun CheckboxComponent(value: String, onTextSelected: (String) -> Unit, onCheckedChange: (Boolean) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(65.dp),
-        verticalAlignment = Alignment1.CenterVertically
+            .heightIn(56.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
 
-        Checkbox(
-            checked = checkedState.value,
-            onCheckedChange = { isChecked ->
-                checkedState.value = isChecked
-            }
-        )
-        ClickableTextComponent(value= value, onTextSelected)
+        val checkedState = remember {
+            mutableStateOf(false)
+        }
+
+        Checkbox(checked = checkedState.value,
+            onCheckedChange = {
+                checkedState.value = !checkedState.value
+                onCheckedChange.invoke(it)
+            })
+
+        ClickableTextComponent(value = value, onTextSelected)
     }
 }
+
 
 @Composable
 fun ClickableTextComponent(value: String, onTextSelected : (String) -> Unit) {
@@ -253,14 +268,22 @@ fun ClickableTextComponent(value: String, onTextSelected : (String) -> Unit) {
 
 
 @Composable
-fun ButtonComponent(value: String){
-    Button(onClick = {},
+fun ButtonComponent(value: String,  onButtonClicked : ()->Unit, isEnabled:Boolean=false){
+    Button(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(),
+        onClick = {
+            onButtonClicked.invoke()
+        },
+
         contentPadding = PaddingValues(),
-        colors = ButtonDefaults.buttonColors(Color.Transparent)
-    ){
+        colors = ButtonDefaults.buttonColors(Color.Transparent),
+        shape = RoundedCornerShape(50.dp),
+        enabled = isEnabled
+
+
+        ){
         Box( modifier = Modifier
             .fillMaxWidth()
             .heightIn(48.dp)
