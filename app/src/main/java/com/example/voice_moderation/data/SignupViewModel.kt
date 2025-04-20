@@ -7,22 +7,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.voice_moderation.navigation.HateDetectionAppRouter
 import com.example.voice_moderation.navigation.Screen
-import com.example.voice_moderation.rules.Validator
-import com.example.voice_moderation.screens.HomeScreen
+import com.example.voice_moderation.data.rules.Validator
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 
 
-class LoginViewModel:ViewModel() {
+class SignupViewModel:ViewModel() {
 
-    private val TAG = LoginViewModel::class.simpleName
+    private val TAG = SignupViewModel::class.simpleName
     var registrationUIState = mutableStateOf(RegistrationUIState())
     var allValidationsPassed = mutableStateOf(false)
     var signUpProgress = mutableStateOf(false)
 
-    fun onEvent(event: UIEvent){
+    fun onEvent(event: SignupUIEvent){
         validateDataWithRules()
         when(event){
-            is UIEvent.FirstNameChanged-> {
+            is SignupUIEvent.FirstNameChanged-> {
                 registrationUIState.value = registrationUIState.value.copy(
                     firstName = event.firstName
                 )
@@ -30,27 +30,27 @@ class LoginViewModel:ViewModel() {
 
             }
 
-            is UIEvent.LastNameChanged ->{
+            is SignupUIEvent.LastNameChanged ->{
                 registrationUIState.value = registrationUIState.value.copy(
                     lastName = event.lastName
                 )
                 printState()
             }
 
-            is UIEvent.EmailChanged ->{
+            is SignupUIEvent.EmailChanged ->{
                 registrationUIState.value = registrationUIState.value.copy(
                     email = event.email
                 )
                 printState()
             }
 
-            is UIEvent.PasswordChanged ->{
+            is SignupUIEvent.PasswordChanged ->{
                 registrationUIState.value = registrationUIState.value.copy(
                     password = event.password
                 )
                 printState()
             }
-            is UIEvent.RegisterButtonClicked ->{
+            is SignupUIEvent.RegisterButtonClicked ->{
                 signUp()
             }
 
@@ -125,7 +125,7 @@ class LoginViewModel:ViewModel() {
         Log.d(TAG,registrationUIState.value.toString())
     }
 
-    fun createUserInFirebase(email:String, password:String){
+    private fun createUserInFirebase(email:String, password:String){
         signUpProgress.value = true
 
         FirebaseAuth
@@ -150,5 +150,20 @@ class LoginViewModel:ViewModel() {
 
     }
 
+    fun logout(){
+        val firebaseAuth = FirebaseAuth.getInstance()
+        firebaseAuth.signOut()
+        val authStateListener = AuthStateListener{
+            if(it.currentUser == null){
+                Log.d(TAG,"Inside sign out outsuccess")
+                HateDetectionAppRouter.navigateTo(Screen.LoginScreen)
+
+        }else{
+            Log.d(TAG,"Inside sign out is not complete")
+        }
+
+    }
+        firebaseAuth.addAuthStateListener (authStateListener)
+    }
 
 }

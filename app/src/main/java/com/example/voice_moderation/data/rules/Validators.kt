@@ -1,4 +1,4 @@
-package com.example.voice_moderation.rules
+package com.example.voice_moderation.data.rules
 
 import android.util.Log
 

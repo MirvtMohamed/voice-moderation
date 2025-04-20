@@ -2,7 +2,7 @@
     <string name="app_name">HateDetectionApp</string>
     <string name="hello">Hey there, </string>
     <string name="create_account">Create an account</string>
-    <string name="welcome">Welcome back</string>
+    <string name="welcome">Welcome back 👋</string>
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>
     <string name="email">email</string>
@@ -16,4 +16,6 @@
     <string name="login">login</string>
     <string name="go_to_login">Already have an account? login</string>
     <string name="forgot_password">Forgot your password</string>
+    <string name="home">Home</string>
+    <string name="logout">Logout</string>
 </resources>

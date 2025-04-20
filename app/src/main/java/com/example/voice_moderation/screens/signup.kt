@@ -27,15 +27,15 @@ import com.example.voice_moderation.components.ButtonComponent
 import com.example.voice_moderation.components.CheckboxComponent
 import com.example.voice_moderation.components.ClickableLoginTextComponent
 import com.example.voice_moderation.components.DividerTextComponent
-import com.example.voice_moderation.data.LoginViewModel
-import com.example.voice_moderation.data.UIEvent
+import com.example.voice_moderation.data.SignupViewModel
+import com.example.voice_moderation.data.SignupUIEvent
 import com.example.voice_moderation.navigation.HateDetectionAppRouter
 import com.example.voice_moderation.navigation.Screen
 
 
 
 @Composable
-fun Signup(loginViewModel: LoginViewModel = viewModel()) {
+fun Signup(signupViewModel: SignupViewModel = viewModel()) {
     Box(modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center){
         Surface(
@@ -53,37 +53,37 @@ fun Signup(loginViewModel: LoginViewModel = viewModel()) {
                     labelValue = stringResource(id = R.string.first_name),
                     painterResource= painterResource(id = R.drawable.profile),
                     onTextSelected = {
-                        loginViewModel.onEvent(UIEvent.FirstNameChanged(it))
+                        signupViewModel.onEvent(SignupUIEvent.FirstNameChanged(it))
 
                     },
-                    loginViewModel.registrationUIState.value.firstNameError
+                    signupViewModel.registrationUIState.value.firstNameError
                 )
                 MyTextFieldComponent(
                     labelValue = stringResource(id = R.string.last_name),
                     painterResource= painterResource(id = R.drawable.profile),
                     onTextSelected = {
-                        loginViewModel.onEvent(UIEvent.LastNameChanged(it))
+                        signupViewModel.onEvent(SignupUIEvent.LastNameChanged(it))
 
                     },
-                    loginViewModel.registrationUIState.value.lastNameError
+                    errorStatus = signupViewModel.registrationUIState.value.lastNameError
                 )
                 MyTextFieldComponent(
                     labelValue = stringResource(id = R.string.email),
                     painterResource = painterResource(id = R.drawable.email),
                     onTextSelected = {
-                        loginViewModel.onEvent(UIEvent.EmailChanged(it))
+                        signupViewModel.onEvent(SignupUIEvent.EmailChanged(it))
 
                     },
-                    loginViewModel.registrationUIState.value.emailError
+                    errorStatus =  signupViewModel.registrationUIState.value.emailError
                 )
                 PasswordTextFieldComponent(
                     labelValue = stringResource(id = R.string.password),
                     painterResource = painterResource(id = R.drawable.password),
                     onTextSelected = {
-                        loginViewModel.onEvent(UIEvent.PasswordChanged(it))
+                        signupViewModel.onEvent(SignupUIEvent.PasswordChanged(it))
 
                     },
-                    loginViewModel.registrationUIState.value.passwordError
+                    signupViewModel.registrationUIState.value.passwordError
                 )
                 CheckboxComponent(value = stringResource(id = R.string.terms_and_conditions),
                     onTextSelected = {
@@ -101,9 +101,9 @@ fun Signup(loginViewModel: LoginViewModel = viewModel()) {
                 ButtonComponent(
                     value = stringResource(id = R.string.register),
                     onButtonClicked = {
-                        loginViewModel.onEvent(UIEvent.RegisterButtonClicked)
+                        signupViewModel.onEvent(SignupUIEvent.RegisterButtonClicked)
                     },
-                    isEnabled = loginViewModel.allValidationsPassed.value
+                    isEnabled = signupViewModel.allValidationsPassed.value
                 )
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -117,7 +117,7 @@ fun Signup(loginViewModel: LoginViewModel = viewModel()) {
 
 
             } }
-        if(loginViewModel.signUpProgress.value) {
+        if(signupViewModel.signUpProgress.value) {
 
             CircularProgressIndicator()
         }
