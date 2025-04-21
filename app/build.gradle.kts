@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -40,7 +42,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
     packaging {
         resources {
@@ -59,6 +61,35 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+        // ViewModel + Lifecycle
+        implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+        implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+
+        // Jetpack Compose (if you're using Compose)
+        implementation("androidx.activity:activity-compose:1.7.2")
+
+
+    // Kotlin Coroutines
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+
+        // OkHttp for WebSocket
+        implementation("com.squareup.okhttp3:okhttp:4.11.0")
+
+        // (Optional) Hilt for DI
+       implementation("com.google.dagger:hilt-android:2.56.1")
+        ksp("com.google.dagger:hilt-android-compiler:2.56.1")
+
+       implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+
+        // Logging (Optional but helpful)
+        implementation("com.jakewharton.timber:timber:5.0.1")
+
+        implementation ("com.google.accompanist:accompanist-permissions:0.35.0-alpha")
+
+
+
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
