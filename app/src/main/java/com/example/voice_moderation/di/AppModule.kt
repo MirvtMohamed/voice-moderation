@@ -21,9 +21,10 @@ object AppModule {
     fun provideAudioStreamer(
         @ApplicationContext context: Context,
         webSocketClient: WebSocketClient
-    ): AudioStreamController {
+    ): AudioStreamer {
         return AudioStreamer(context, webSocketClient)
     }
+
 
     @Provides
     fun provideWebSocketClient(): WebSocketClient {

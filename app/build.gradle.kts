@@ -1,9 +1,11 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id("com.google.devtools.ksp")
-    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
+
 }
+
 
 android {
     namespace = "com.example.voice_moderation"
@@ -42,7 +44,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.3"
+        kotlinCompilerExtensionVersion = "1.5.4"
     }
     packaging {
         resources {
@@ -62,31 +64,23 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-        // ViewModel + Lifecycle
-        implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
-        implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    // Hilt for Dependency Injection
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 
-        // Jetpack Compose (if you're using Compose)
-        implementation("androidx.activity:activity-compose:1.7.2")
+    // OkHttp for WebSocket support
+    implementation(libs.okhttp)
 
+    // Kotlin Coroutines for asynchronous programming
+    implementation(libs.coroutines.core)
+    // ViewModel and Lifecycle
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx.v281)
 
-    // Kotlin Coroutines
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    implementation(libs.timber)
 
-        // OkHttp for WebSocket
-        implementation("com.squareup.okhttp3:okhttp:4.11.0")
-
-        // (Optional) Hilt for DI
-       implementation("com.google.dagger:hilt-android:2.56.1")
-        ksp("com.google.dagger:hilt-android-compiler:2.56.1")
-
-       implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
-
-        // Logging (Optional but helpful)
-        implementation("com.jakewharton.timber:timber:5.0.1")
-
-        implementation ("com.google.accompanist:accompanist-permissions:0.35.0-alpha")
-
+    implementation(libs.accompanist.permissions)
 
 
 

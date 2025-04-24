@@ -8,12 +8,15 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import androidx.core.content.ContextCompat
 import com.example.voice_moderation.data.network.WebSocketClient
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class AudioStreamer(
+class AudioStreamer @Inject constructor(
+    @ApplicationContext
     private val context: Context,
     private val webSocketClient: WebSocketClient
 ) : AudioStreamController {
