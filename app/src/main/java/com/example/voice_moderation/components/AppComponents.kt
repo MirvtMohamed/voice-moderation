@@ -2,6 +2,7 @@ package com.example.voice_moderation.components
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -283,7 +284,7 @@ fun ButtonComponent(value: String,  onButtonClicked : ()->Unit, isEnabled:Boolea
         enabled = isEnabled
 
 
-        ){
+    ){
         Box( modifier = Modifier
             .fillMaxWidth()
             .heightIn(48.dp)
@@ -367,21 +368,21 @@ fun ClickableLoginTextComponent(tryingToLogin:Boolean = true, onTextSelected : (
 }
 
 @Composable
-fun UnderLinedTextComponenet(value: String) {
+fun UnderLinedTextComponenet(value: String, onTextSelected: () -> Unit) {
     Text(
         text = value,
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 40.dp),
+            .heightIn(min = 40.dp)
+            .clickable(onClick = onTextSelected), // Add clickable modifier
         style = TextStyle(
             fontSize = 16.sp,
             fontWeight = FontWeight.Normal,
             fontStyle = FontStyle.Normal
-        )
-        , color = colorResource(id = R.color.gray),
+        ),
+        color = colorResource(id = R.color.gray),
         textAlign = TextAlign.Center,
         textDecoration = TextDecoration.Underline
-
     )
 }
 

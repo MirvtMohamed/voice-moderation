@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.voice_moderation.navigation.HateDetectionAppRouter
 import com.example.voice_moderation.navigation.Screen
+import com.example.voice_moderation.screens.ForgetPasswordScreen
 import com.example.voice_moderation.screens.HomeScreen
 import com.example.voice_moderation.screens.LoginScreen
 import com.example.voice_moderation.screens.Signup
@@ -19,7 +20,7 @@ fun HateDetectionApp() {
         modifier = Modifier.fillMaxSize(),
         color = Color.White
     ) {
-        Crossfade(targetState =  HateDetectionAppRouter.currentScreen){ currentState ->
+        Crossfade(targetState =  HateDetectionAppRouter.currentScreen, label = ""){ currentState ->
             when( currentState.value) {
                 is Screen.SignUp -> {
                     Signup()
@@ -34,6 +35,10 @@ fun HateDetectionApp() {
                 }
                 is Screen.HomeScreen ->{
                     HomeScreen()
+                }
+
+                is Screen.ForgetPasswordScreen -> {
+                    ForgetPasswordScreen()
                 }
 
             }}

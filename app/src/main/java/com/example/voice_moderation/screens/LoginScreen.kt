@@ -150,7 +150,13 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
                     )
                     Spacer(modifier = Modifier.height(40.dp))
 
-                    UnderLinedTextComponenet(value = stringResource(id = R.string.forgot_password))
+                    UnderLinedTextComponenet(
+                        value = stringResource(id = R.string.forgot_password),
+                        onTextSelected = {
+                            HateDetectionAppRouter.navigateTo(Screen.ForgetPasswordScreen)
+                        }
+                    )
+
                     Spacer(modifier = Modifier.height(40.dp))
 
                     ButtonComponent(
@@ -183,7 +189,9 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
     SystemBackButtonHandler {
         HateDetectionAppRouter.navigateTo(Screen.SignUp)
 
-}}
+    }
+
+}
 
 @Preview
 @Composable
