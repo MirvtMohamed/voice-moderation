@@ -30,4 +30,5 @@ object AppModule {
     fun provideWebSocketClient(): WebSocketClient {
         return WebSocketClient() // or inject dependencies if needed
     }
+
 }

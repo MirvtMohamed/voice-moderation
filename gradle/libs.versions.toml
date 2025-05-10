@@ -1,5 +1,8 @@
 [versions]
 agp = "8.5.1"
+
+datastoreCore = "1.0.0"
+datastorePreferences = "1.0.0"
 hiltNavigationCompose = "1.2.0"
 kotlin = "1.9.20"
 coreKtx = "1.15.0"
@@ -9,7 +12,7 @@ espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
 composeBom = "2025.04.00"
-ksp = "1.9.0-1.0.13"
+ksp = "1.9.10-1.0.13"
 hilt = "2.48"
 lifecycleRuntimeKtxVersion = "2.8.1"
 okhttp = "4.12.0"
@@ -18,8 +21,13 @@ timber = "5.0.1"
 accompanistPermissions = "0.35.0-alpha"
 
 
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-datastore-core = { module = "androidx.datastore:datastore-core", version.ref = "datastoreCore" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
+androidx-datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastorePreferences" }
+androidx-datastore-preferences-rxjava3 = { module = "androidx.datastore:datastore-preferences-rxjava3", version.ref = "datastoreCore" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-lifecycle-runtime-ktx-v281 = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtxVersion" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleRuntimeKtx" }

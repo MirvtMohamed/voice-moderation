@@ -66,6 +66,7 @@ dependencies {
 
     // Hilt for Dependency Injection
     implementation(libs.hilt.android)
+
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
@@ -81,6 +82,16 @@ dependencies {
     implementation(libs.timber)
 
     implementation(libs.accompanist.permissions)
+
+
+
+
+    // optional - RxJava3 support
+   implementation(libs.androidx.datastore.preferences.rxjava3)
+    implementation(libs.androidx.datastore.core)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.preferences.core)
+
 
 
 

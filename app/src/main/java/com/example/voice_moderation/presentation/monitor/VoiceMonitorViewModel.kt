@@ -2,17 +2,28 @@ package com.example.voice_moderation.presentation.monitor
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.voice_moderation.data.preferences.MonitoringPreferencesRepository
 import com.example.voice_moderation.service.VoiceMonitoringService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class VoiceMonitorViewModel @Inject constructor() : ViewModel() {
+class VoiceMonitorViewModel @Inject constructor(private val monitoringPreferencesRepository: MonitoringPreferencesRepository) : ViewModel() {
 
     private val _isRecording = MutableStateFlow(false)
     val isRecording: StateFlow<Boolean> = _isRecording
+
+    init {
+        viewModelScope.launch {
+            monitoringPreferencesRepository.isRecording.collect { state ->
+                _isRecording.value = state
+            }
+        }
+    }
 
     fun startMonitoring(context: Context) {
         if (!_isRecording.value) {
@@ -24,12 +35,19 @@ class VoiceMonitorViewModel @Inject constructor() : ViewModel() {
     fun stopMonitoring(context: Context) {
         if (_isRecording.value) {
             VoiceMonitoringService.stopService(context)
-            _isRecording.value = false
+            saveMonitoringState(false) // Save the state change
         }
     }
 
+    fun saveMonitoringState(isRecording: Boolean) {
+        viewModelScope.launch {
+            monitoringPreferencesRepository.setMonitoringState(isRecording)
+        }
+    }
+
+
     override fun onCleared() {
-        _isRecording.value = false
+        // No need to reset state here, as it should be managed by preferences
         super.onCleared()
     }
 }
