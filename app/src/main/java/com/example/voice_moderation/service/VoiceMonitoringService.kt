@@ -11,7 +11,9 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.example.voice_moderation.MainActivity
 import com.example.voice_moderation.R
+import com.example.voice_moderation.data.audio.AudioStreamController
 import com.example.voice_moderation.data.audio.AudioStreamer
+import com.example.voice_moderation.data.model.domain.repository.VoiceRepository
 import com.example.voice_moderation.data.preferences.MonitoringPreferencesRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -27,13 +29,21 @@ class VoiceMonitoringService : Service() {
 
     @Inject
     lateinit var audioStreamer: AudioStreamer
+    @Inject
+    lateinit var audioStreamController: AudioStreamController
+
+
+    @Inject
+    lateinit var voiceRepository: VoiceRepository
 
     @Inject
     lateinit var preferencesRepository: MonitoringPreferencesRepository
 
+
     private val serviceScope = CoroutineScope(Dispatchers.IO + Job())
     private val CHANNEL_ID = "VoiceMonitorChannel"
     private val NOTIFICATION_ID = 1
+    private val ALERT_NOTIFICATION_ID = 2
 
     companion object {
         private const val ACTION_START = "com.example.voice_moderation.START"
@@ -80,7 +90,8 @@ class VoiceMonitoringService : Service() {
     private fun startMonitoring() {
         serviceScope.launch {
             try {
-                audioStreamer.start()
+                audioStreamController.start()
+                updatePreferences(true)
             } catch (e: Exception) {
                 Timber.e(e, "Error in voice monitoring")
                 updatePreferences(false)
@@ -154,7 +165,7 @@ class VoiceMonitoringService : Service() {
     override fun onDestroy() {
         Timber.d("Voice Monitoring Service destroyed")
         serviceScope.launch {
-            audioStreamer.stop()
+            audioStreamController.stop()
             updatePreferences(false)
         }
         serviceScope.cancel()

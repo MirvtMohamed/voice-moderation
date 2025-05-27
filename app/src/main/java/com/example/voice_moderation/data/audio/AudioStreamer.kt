@@ -7,7 +7,6 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import androidx.core.content.ContextCompat
-import com.example.voice_moderation.data.network.WebSocketClient
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +17,7 @@ import javax.inject.Inject
 class AudioStreamer @Inject constructor(
     @ApplicationContext
     private val context: Context,
-    private val webSocketClient: WebSocketClient
+    private val audioProcessor: AudioProcessor
 ) : AudioStreamController {
     private var audioRecord: AudioRecord? = null
     private var isStreaming = false
@@ -60,24 +59,23 @@ class AudioStreamer @Inject constructor(
                 while (isStreaming) {
                     val read = audioRecord?.read(buffer, 0, buffer.size) ?: 0
                     if (read > 0 && isSpeech(buffer)) {
-                        webSocketClient.send(buffer.copyOf(read))
+                        // Send to AudioProcessor instead of WebSocketClient
+                        audioProcessor.processAudioData(buffer.copyOf(read))
                     }
                 }
             }
-
-            webSocketClient.connect()
         } catch (e: SecurityException) {
             Timber.tag("AudioStreamer").e(e, "SecurityException when starting recording.")
         }
     }
-
 
     override fun stop() {
         isStreaming = false
         audioRecord?.stop()
         audioRecord?.release()
         audioRecord = null
-        webSocketClient.disconnect()
+        // Clear audio processor buffer
+        audioProcessor.clear()
     }
 
     // Very basic VAD

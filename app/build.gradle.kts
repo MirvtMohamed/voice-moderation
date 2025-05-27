@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    id("kotlin-parcelize")
 
 }
 
@@ -66,6 +67,7 @@ dependencies {
 
     // Hilt for Dependency Injection
     implementation(libs.hilt.android)
+    implementation(libs.androidx.media3.common.ktx)
 
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
@@ -92,6 +94,10 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.datastore.preferences.core)
 
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
+    implementation(libs.gson)
+    implementation (libs.logging.interceptor)
 
 
 
