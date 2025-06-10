@@ -1,15 +1,33 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# Built files
+/build/
+*.apk
+*.ap_
+
+# Gradle
+.gradle/
 local.properties
+*.log
+
+# IntelliJ/Android Studio
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Keystore files
+*.jks
+*.keystore
+
+# Firebase config (DO NOT commit this file)
+app/google-services.json
+
+# Kotlin/Compose
+*.kotlin_module
+
+# Caches
+.cxx/
+.externalNativeBuild/
