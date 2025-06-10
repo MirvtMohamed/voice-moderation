@@ -11,16 +11,16 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.example.voice_moderation.MainActivity
 import com.example.voice_moderation.R
-import com.example.voice_moderation.data.audio.AudioStreamController
-import com.example.voice_moderation.data.audio.AudioStreamer
-import com.example.voice_moderation.data.model.domain.repository.VoiceRepository
+import com.example.voice_moderation.domain.audio.AudioStreamController
 import com.example.voice_moderation.data.preferences.MonitoringPreferencesRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext // Added for NonCancellable context
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -28,22 +28,14 @@ import javax.inject.Inject
 class VoiceMonitoringService : Service() {
 
     @Inject
-    lateinit var audioStreamer: AudioStreamer
-    @Inject
     lateinit var audioStreamController: AudioStreamController
-
-
-    @Inject
-    lateinit var voiceRepository: VoiceRepository
 
     @Inject
     lateinit var preferencesRepository: MonitoringPreferencesRepository
 
-
-    private val serviceScope = CoroutineScope(Dispatchers.IO + Job())
+    private val serviceScope = CoroutineScope(Dispatchers.IO + Job()) // Use a Job for explicit cancellation
     private val CHANNEL_ID = "VoiceMonitorChannel"
     private val NOTIFICATION_ID = 1
-    private val ALERT_NOTIFICATION_ID = 2
 
     companion object {
         private const val ACTION_START = "com.example.voice_moderation.START"
@@ -53,7 +45,14 @@ class VoiceMonitoringService : Service() {
             val intent = Intent(context, VoiceMonitoringService::class.java).apply {
                 action = ACTION_START
             }
-            context.startService(intent)
+            // For Android O (API 26) and above, services started in the background
+            // must call startForeground() within five seconds.
+            // Using ContextCompat.startForegroundService is recommended.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
+            }
         }
 
         fun stopService(context: Context) {
@@ -76,11 +75,11 @@ class VoiceMonitoringService : Service() {
                 Timber.d("Starting voice monitoring")
                 startForeground(NOTIFICATION_ID, createNotification())
                 startMonitoring()
-                updatePreferences(true)
+                // updatePreferences(true) // State update moved inside startMonitoring for consistency
             }
             ACTION_STOP -> {
                 Timber.d("Stopping voice monitoring")
-                updatePreferences(false)
+                // updatePreferences(false) // State update moved to onDestroy for consistency
                 stopSelf()
             }
         }
@@ -91,25 +90,18 @@ class VoiceMonitoringService : Service() {
         serviceScope.launch {
             try {
                 audioStreamController.start()
-                updatePreferences(true)
+                preferencesRepository.setMonitoringState(true) // Update state here
+                Timber.d("Voice monitoring started and state updated to true")
             } catch (e: Exception) {
-                Timber.e(e, "Error in voice monitoring")
-                updatePreferences(false)
-                stopSelf()
+                Timber.e(e, "Error starting voice monitoring")
+                preferencesRepository.setMonitoringState(false) // Update state on error
+                stopSelf() // Stop service on error
             }
         }
     }
 
-    private fun updatePreferences(isRecording: Boolean) {
-        serviceScope.launch {
-            try {
-                preferencesRepository.setMonitoringState(isRecording)
-                Timber.d("Updated recording state to: $isRecording")
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to update preferences")
-            }
-        }
-    }
+    // Removed updatePreferences(isRecording: Boolean) as a separate public function
+    // Its logic is now integrated directly where state changes occur (startMonitoring, onDestroy)
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -164,11 +156,15 @@ class VoiceMonitoringService : Service() {
 
     override fun onDestroy() {
         Timber.d("Voice Monitoring Service destroyed")
+        // Use withContext(NonCancellable) to ensure cleanup tasks complete
         serviceScope.launch {
-            audioStreamController.stop()
-            updatePreferences(false)
+            withContext(NonCancellable) {
+                audioStreamController.stop()
+                preferencesRepository.setMonitoringState(false) // Update state to false on destroy
+                Timber.d("Voice monitoring stopped and state updated to false")
+            }
         }
-        serviceScope.cancel()
+        serviceScope.cancel() // Cancel the scope after launching non-cancellable cleanup
         super.onDestroy()
     }
 

@@ -1,138 +1,131 @@
 package com.example.voice_moderation.data.audio
 
 import android.content.Context
-import com.example.voice_moderation.data.model.domain.repository.VoiceRepository
-import com.example.voice_moderation.data.remote.ApiResult
-import com.example.voice_moderation.ui.alerts.AlertBroadcastReceiver
+import com.example.voice_moderation.data.audio.util.WavFileWriter
+import com.example.voice_moderation.domain.usecase.AnalyzeVoiceUseCase
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
-import javax.inject.Inject
+import java.util.concurrent.ConcurrentLinkedDeque
 
 class AudioProcessor @Inject constructor(
-    private val repository: VoiceRepository,
-    private val context: Context
+    private val analyzeVoiceUseCase: AnalyzeVoiceUseCase,
+    @ApplicationContext private val context: Context
 ) {
-    private val audioBuffer = ByteArrayOutputStream()
-    private val sampleRate = 16000
-    private val bytesPerSecond = sampleRate * 2  // 16-bit audio = 2 bytes per sample
-    private val chunkDurationSeconds = 10
-    private val chunkSizeBytes = bytesPerSecond * chunkDurationSeconds
 
-    private val processingScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    private val mutex = Mutex() // For thread safety
+    private val processingScope = CoroutineScope(Dispatchers.IO)
+    private var processingJob: Job? = null
 
-    fun processAudioData(data: ByteArray) {
+    // Audio format constants (should match AudioStreamer)
+    private val SAMPLE_RATE = 16000
+    private val NUM_CHANNELS = 1 // Mono
+    private val BIT_DEPTH = 16
+    private val BYTES_PER_SAMPLE = BIT_DEPTH / 8
+
+    // Chunking parameters
+    private val CHUNK_DURATION_MS = 5000L // 5 seconds per audio chunk
+    private val SAMPLES_PER_CHUNK = (SAMPLE_RATE * CHUNK_DURATION_MS / 1000).toInt()
+    private val BYTES_PER_CHUNK = SAMPLES_PER_CHUNK * BYTES_PER_SAMPLE * NUM_CHANNELS
+
+    private val audioBufferQueue = ConcurrentLinkedDeque<ByteArray>() // Changed to ConcurrentLinkedDeque
+    private var currentBufferBytes = 0
+
+    fun processAudioData(audioData: ByteArray) {
+        audioBufferQueue.add(audioData)
+        currentBufferBytes += audioData.size
+
+        // Start processing job if not already running
+        if (processingJob == null || processingJob?.isActive == false) {
+            startProcessingJob()
+        }
+    }
+
+    private fun startProcessingJob() {
+        processingJob = processingScope.launch {
+            while (true) {
+                if (currentBufferBytes >= BYTES_PER_CHUNK) {
+                    val chunk = extractAudioChunk()
+                    if (chunk != null) {
+                        processChunkForApi(chunk)
+                    }
+                } else {
+                    // Wait for more audio data if not enough for a full chunk
+                    delay(100) // Small delay to prevent busy-waiting
+                }
+            }
+        }
+    }
+
+    private fun extractAudioChunk(): ByteArray? {
+        if (currentBufferBytes < BYTES_PER_CHUNK) {
+            return null
+        }
+
+        val chunkBuffer = ByteArray(BYTES_PER_CHUNK)
+        var bytesCopied = 0
+
+        while (bytesCopied < BYTES_PER_CHUNK && audioBufferQueue.isNotEmpty()) {
+            val head = audioBufferQueue.peek()
+            val bytesToCopy = minOf(head.size, BYTES_PER_CHUNK - bytesCopied)
+
+            System.arraycopy(head, 0, chunkBuffer, bytesCopied, bytesToCopy)
+            bytesCopied += bytesToCopy
+
+            if (bytesToCopy == head.size) {
+                audioBufferQueue.poll() // Remove fully consumed buffer
+            } else {
+                // Partial consumption, create a new array for the remainder
+                val remaining = ByteArray(head.size - bytesToCopy)
+                System.arraycopy(head, bytesToCopy, remaining, 0, remaining.size)
+                audioBufferQueue.poll()
+                audioBufferQueue.addFirst(remaining) // Changed to addFirst()
+            }
+        }
+        currentBufferBytes -= BYTES_PER_CHUNK
+        return chunkBuffer
+    }
+
+    private fun processChunkForApi(audioChunk: ByteArray) {
         processingScope.launch {
-            mutex.withLock {
-                audioBuffer.write(data, 0, data.size)
+            val tempFile = File(context.cacheDir, "audio_chunk_${System.currentTimeMillis()}.wav")
+            try {
+                WavFileWriter.writeWavFile(
+                    tempFile,
+                    audioChunk,
+                    SAMPLE_RATE,
+                    NUM_CHANNELS,
+                    BIT_DEPTH
+                )
+                Timber.d("WAV file created: %s", tempFile.absolutePath)
 
-                if (audioBuffer.size() >= chunkSizeBytes) {
-                    val audioChunk = audioBuffer.toByteArray()
-                    audioBuffer.reset()
-
-                    val tempFile = createTempWavFile(audioChunk)
-                    analyzeAudioFile(tempFile)
+                analyzeVoiceUseCase(tempFile).collect {
+                    // Handle the ApiResult from the use case
+                    // e.g., log, update a shared flow for UI, etc.
+                    Timber.d("Audio analysis result: %s", it)
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Error processing audio chunk for API")
+            } finally {
+                if (tempFile.exists()) {
+                    tempFile.delete() // Clean up the temporary file
+                    Timber.d("Deleted temporary WAV file: %s", tempFile.absolutePath)
                 }
             }
         }
     }
 
     fun clear() {
-        processingScope.launch {
-            mutex.withLock {
-                audioBuffer.reset()
-            }
-        }
-    }
-
-    private suspend fun analyzeAudioFile(audioFile: File) {
-        try {
-            repository.analyzeAudio(audioFile).collect { result ->
-                when (result) {
-                    is ApiResult.Success -> {
-                        val analysisResult = result.data
-                        if (analysisResult.needsAlert) {
-                            // Here you could emit an event or call a callback
-                            AlertBroadcastReceiver.sendAlert(
-                                context, // Inject this
-                                analysisResult
-                            )
-//                            Timber.d("Alert needed: $analysisResult")
-                        }
-                    }
-                    is ApiResult.Error -> {
-                        Timber.e(result.exception, "Error analyzing audio")
-                    }
-                    is ApiResult.Loading -> {
-                        // Handle loading state
-                    }
-                }
-            }
-
-            // Clean up temp file
-            try {
-                audioFile.delete()
-            } catch (e: Exception) {
-                Timber.e(e, "Error deleting temp file")
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Error processing audio chunk")
-        }
-    }
-
-    private fun createTempWavFile(audioData: ByteArray): File {
-        val tempFile = File.createTempFile("audio_chunk", ".wav")
-
-        FileOutputStream(tempFile).use { out ->
-            // WAV header
-            writeString(out, "RIFF")
-            writeInt(out, 36 + audioData.size)
-            writeString(out, "WAVE")
-
-            // Format subchunk
-            writeString(out, "fmt ")
-            writeInt(out, 16)
-            writeShort(out, 1) // PCM
-            writeShort(out, 1) // Mono
-            writeInt(out, sampleRate)
-            writeInt(out, sampleRate * 2) // Byte rate
-            writeShort(out, 2) // Block align
-            writeShort(out, 16) // Bits per sample
-
-            // Data subchunk
-            writeString(out, "data")
-            writeInt(out, audioData.size)
-
-            // Audio data
-            out.write(audioData)
-        }
-
-        return tempFile
-    }
-
-    private fun writeString(out: FileOutputStream, value: String) {
-        for (i in 0 until value.length) {
-            out.write(value[i].code)
-        }
-    }
-
-    private fun writeInt(out: FileOutputStream, value: Int) {
-        out.write(value and 0xFF)
-        out.write((value shr 8) and 0xFF)
-        out.write((value shr 16) and 0xFF)
-        out.write((value shr 24) and 0xFF)
-    }
-
-    private fun writeShort(out: FileOutputStream, value: Int) {
-        out.write(value and 0xFF)
-        out.write((value shr 8) and 0xFF)
+        processingJob?.cancel() // Cancel any ongoing processing
+        audioBufferQueue.clear() // Clear all accumulated audio data
+        currentBufferBytes = 0
+        Timber.d("AudioProcessor cleared and processing job cancelled.")
     }
 }

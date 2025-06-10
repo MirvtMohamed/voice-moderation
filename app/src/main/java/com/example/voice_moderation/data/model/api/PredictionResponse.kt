@@ -1,7 +1,12 @@
 package com.example.voice_moderation.data.model.api
 
+import com.google.gson.annotations.SerializedName
+
 data class PredictionResponse(
-    val transcription: String,
-    val emotion: String,
-    val hate_prediction: HatePredictionResponse
+    @SerializedName("transcription")
+    val transcription: String?,
+    @SerializedName("emotion")
+    val emotion: String?,
+    @SerializedName("hate_prediction")
+    val hatePrediction: HatePredictionResponse?
 )

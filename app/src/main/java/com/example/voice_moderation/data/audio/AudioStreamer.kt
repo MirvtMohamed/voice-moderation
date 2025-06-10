@@ -7,6 +7,7 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import androidx.core.content.ContextCompat
+import com.example.voice_moderation.domain.audio.AudioStreamController
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -58,8 +59,7 @@ class AudioStreamer @Inject constructor(
                 val buffer = ByteArray(bufferSize)
                 while (isStreaming) {
                     val read = audioRecord?.read(buffer, 0, buffer.size) ?: 0
-                    if (read > 0 && isSpeech(buffer)) {
-                        // Send to AudioProcessor instead of WebSocketClient
+                    if (read > 0) { // Removed isSpeech check
                         audioProcessor.processAudioData(buffer.copyOf(read))
                     }
                 }
@@ -74,13 +74,12 @@ class AudioStreamer @Inject constructor(
         audioRecord?.stop()
         audioRecord?.release()
         audioRecord = null
-        // Clear audio processor buffer
         audioProcessor.clear()
     }
 
-    // Very basic VAD
-    private fun isSpeech(audioData: ByteArray): Boolean {
-        val energy = audioData.sumOf { it.toInt() * it.toInt() } / audioData.size
-        return energy > 1000
-    }
+    // Basic VAD - now optional, as AudioProcessor handles continuous stream
+    // private fun isSpeech(audioData: ByteArray): Boolean {
+    //     val energy = audioData.sumOf { it.toInt() * it.toInt() } / audioData.size
+    //     return energy > 1000
+    // }
 }

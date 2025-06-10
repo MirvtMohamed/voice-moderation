@@ -1,4 +1,6 @@
-package com.example.voice_moderation.data.model.domain
+package com.example.voice_moderation.domain.model
+
+
 
 import kotlinx.parcelize.Parcelize
 import android.os.Parcelable
@@ -10,7 +12,4 @@ data class AudioAnalysisResult(
     val hateSpeechDetected: Boolean,
     val threatDetected: Boolean,
     val severityLevel: Int
-) : Parcelable {
-    val needsAlert: Boolean
-        get() = hateSpeechDetected || threatDetected || severityLevel > 1
-}
+) : Parcelable

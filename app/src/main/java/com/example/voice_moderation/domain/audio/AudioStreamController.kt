@@ -1,4 +1,4 @@
-package com.example.voice_moderation.data.audio
+package com.example.voice_moderation.domain.audio
 
 
 interface AudioStreamController {

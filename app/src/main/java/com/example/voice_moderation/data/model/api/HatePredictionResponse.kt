@@ -1,10 +1,18 @@
 package com.example.voice_moderation.data.model.api
 
+import com.google.gson.annotations.SerializedName
+
 data class HatePredictionResponse(
-    val toxic: Int,
-    val severe_toxic: Int,
-    val obscene: Int,
-    val threat: Int,
-    val insult: Int,
-    val identity_hate: Int
+    @SerializedName("toxic")
+    val toxic: Int?,
+    @SerializedName("severe_toxic")
+    val severeToxic: Int?,
+    @SerializedName("obscene")
+    val obscene: Int?,
+    @SerializedName("threat")
+    val threat: Int?,
+    @SerializedName("insult")
+    val insult: Int?,
+    @SerializedName("identity_hate")
+    val identityHate: Int?
 )
