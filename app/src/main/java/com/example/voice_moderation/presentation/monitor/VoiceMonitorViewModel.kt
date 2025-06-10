@@ -12,7 +12,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class VoiceMonitorViewModel @Inject constructor(private val monitoringPreferencesRepository: MonitoringPreferencesRepository) : ViewModel() {
+class VoiceMonitorViewModel @Inject constructor(
+    private val monitoringPreferencesRepository: MonitoringPreferencesRepository
+) : ViewModel() {
 
     private val _isRecording = MutableStateFlow(false)
     val isRecording: StateFlow<Boolean> = _isRecording
@@ -26,28 +28,18 @@ class VoiceMonitorViewModel @Inject constructor(private val monitoringPreference
     }
 
     fun startMonitoring(context: Context) {
-        if (!_isRecording.value) {
+        viewModelScope.launch {
+            // Set state first to prevent UI flicker
+            monitoringPreferencesRepository.setMonitoringState(true)
             VoiceMonitoringService.startService(context)
-            _isRecording.value = true
         }
     }
 
     fun stopMonitoring(context: Context) {
-        if (_isRecording.value) {
-            VoiceMonitoringService.stopService(context)
-            saveMonitoringState(false) // Save the state change
-        }
-    }
-
-    fun saveMonitoringState(isRecording: Boolean) {
         viewModelScope.launch {
-            monitoringPreferencesRepository.setMonitoringState(isRecording)
+            // Set state first to prevent UI flicker
+            monitoringPreferencesRepository.setMonitoringState(false)
+            VoiceMonitoringService.stopService(context)
         }
-    }
-
-
-    override fun onCleared() {
-        // No need to reset state here, as it should be managed by preferences
-        super.onCleared()
     }
 }

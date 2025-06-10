@@ -33,7 +33,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideAudioProcessor(
-        analyzeVoiceUseCase: AnalyzeVoiceUseCase, // Updated dependency
+        analyzeVoiceUseCase: AnalyzeVoiceUseCase,
         @ApplicationContext context: Context,
     ): AudioProcessor {
         return AudioProcessor(analyzeVoiceUseCase, context)

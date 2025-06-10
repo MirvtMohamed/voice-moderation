@@ -1,8 +1,25 @@
 package com.example.voice_moderation.presentation.monitor
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -11,9 +28,6 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
-import android.content.Intent
-import android.net.Uri
-import android.provider.Settings
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -23,7 +37,8 @@ fun MonitoringScreen(
     val context = LocalContext.current
     val isRecording by viewModel.isRecording.collectAsState()
     val recordAudioPermission = rememberPermissionState(android.Manifest.permission.RECORD_AUDIO)
-    var isProcessing by remember { mutableStateOf(false) }
+
+    // Removed 'isProcessing' local state as it's not effectively managing async operations
 
     LaunchedEffect(Unit) {
         if (!recordAudioPermission.status.isGranted) {
@@ -45,40 +60,31 @@ fun MonitoringScreen(
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
-
                 Button(
                     onClick = {
-                        isProcessing = true
                         if (isRecording) {
                             viewModel.stopMonitoring(context)
                         } else {
                             viewModel.startMonitoring(context)
                         }
-                        isProcessing = false
+                        // No need to manage 'isProcessing' here; 'isRecording' will update asynchronously
                     },
-                    enabled = !isProcessing,
+                    // Button is always enabled if permission is granted, allowing user to toggle
+                    // The UI will update when 'isRecording' state changes from preferences
+                    enabled = true,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    if (isProcessing) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Text(if (isRecording) "Stop Monitoring" else "Start Monitoring")
-                    }
+                    // Removed CircularProgressIndicator based on local 'isProcessing' state
+                    Text(if (isRecording) "Stop Monitoring" else "Start Monitoring")
                 }
             }
-
-
-                recordAudioPermission.status.shouldShowRationale -> {
+            recordAudioPermission.status.shouldShowRationale -> {
                 Text("The app needs microphone permission to monitor speech.")
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = { recordAudioPermission.launchPermissionRequest() }) {
                     Text("Grant Microphone Permission")
                 }
             }
-
             else -> {
                 Text("Microphone permission permanently denied. Please enable it in app settings.")
                 Spacer(modifier = Modifier.height(16.dp))
@@ -91,7 +97,6 @@ fun MonitoringScreen(
                     Text("Open App Settings")
                 }
             }
-
         }
     }
 }
