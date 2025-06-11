@@ -1,3 +1,21 @@
 <resources>
-    <string name="app_name">voice-moderation</string>
+    <string name="app_name">HateDetectionApp</string>
+    <string name="hello">Hey there, </string>
+    <string name="create_account">Create an account</string>
+    <string name="welcome">Welcome back 👋</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="email">email</string>
+    <string name="password">password</string>
+    <string name="hide_password">Hide password</string>
+    <string name="show_password">Show password</string>
+    <string name="terms_and_conditions">By continuing you accept our Privacy Policy Term of Use</string>
+    <string name="terms_and_conditions_header">Terms of Use</string>
+    <string name="register">Register</string>
+    <string name="or">or</string>
+    <string name="login">login</string>
+    <string name="go_to_login">Already have an account? login</string>
+    <string name="forgot_password">Forgot your password</string>
+    <string name="home">Home</string>
+    <string name="logout">Logout</string>
 </resources>
