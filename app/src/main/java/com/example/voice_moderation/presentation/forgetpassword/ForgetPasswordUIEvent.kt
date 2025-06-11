@@ -1,4 +1,4 @@
-package com.example.voice_moderation.data
+package com.example.voice_moderation.presentation.forgetpassword
 
 sealed class ForgetPasswordUIEvent {
     data class EmailChanged(val email: String) : ForgetPasswordUIEvent()

@@ -1,4 +1,4 @@
-package com.example.voice_moderation.data
+package com.example.voice_moderation.presentation.login
 
 
 sealed class LoginUIEvent {
@@ -7,5 +7,5 @@ sealed class LoginUIEvent {
     data class PasswordChanged(val password: String) : LoginUIEvent()
 
 
-    object LoginButtonClicked :LoginUIEvent()
+    object LoginButtonClicked : LoginUIEvent()
 }

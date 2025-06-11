@@ -1,4 +1,4 @@
-package com.example.voice_moderation.screens
+package com.example.voice_moderation.presentation.signup
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -25,24 +25,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.voice_moderation.LoginViewModel
-import com.example.voice_moderation.R
-import com.example.voice_moderation.components.ButtonComponent
-import com.example.voice_moderation.components.ClickableLoginTextComponent
-import com.example.voice_moderation.components.DividerTextComponent
 import com.example.voice_moderation.components.HeadingTextComponent
 import com.example.voice_moderation.components.MyTextFieldComponent
 import com.example.voice_moderation.components.NormalTextComponenet
 import com.example.voice_moderation.components.PasswordTextFieldComponent
-import com.example.voice_moderation.components.UnderLinedTextComponenet
-import com.example.voice_moderation.data.LoginUIEvent
+import com.example.voice_moderation.R
+import com.example.voice_moderation.components.ButtonComponent
+import com.example.voice_moderation.components.CheckboxComponent
+import com.example.voice_moderation.components.ClickableLoginTextComponent
+import com.example.voice_moderation.components.DividerTextComponent
 import com.example.voice_moderation.navigation.HateDetectionAppRouter
 import com.example.voice_moderation.navigation.Screen
-import com.example.voice_moderation.navigation.SystemBackButtonHandler
 
 
 @Composable
-fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
+fun Signup(signupViewModel: SignupViewModel = viewModel()) {
     // Main container with white background
     Box(
         modifier = Modifier
@@ -126,54 +123,67 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
                         .fillMaxSize()
                         .padding(24.dp)
                 ) {
-                    Spacer(modifier = Modifier.height(36.dp))
-                    NormalTextComponenet(value = stringResource(id = R.string.login))
-                    HeadingTextComponent(value = stringResource(id = R.string.welcome))
                     Spacer(modifier = Modifier.height(20.dp))
+                    NormalTextComponenet(value = stringResource(id = R.string.hello))
+                    HeadingTextComponent(value = stringResource(id = R.string.create_account))
 
+                    MyTextFieldComponent(
+                        labelValue = stringResource(id = R.string.first_name),
+                        painterResource = painterResource(id = R.drawable.profile),
+                        onTextSelected = {
+                            signupViewModel.onEvent(SignupUIEvent.FirstNameChanged(it))
+                        },
+                        errorStatus = signupViewModel.registrationUIState.value.firstNameError
+                    )
+                    MyTextFieldComponent(
+                        labelValue = stringResource(id = R.string.last_name),
+                        painterResource = painterResource(id = R.drawable.profile),
+                        onTextSelected = {
+                            signupViewModel.onEvent(SignupUIEvent.LastNameChanged(it))
+                        },
+                        errorStatus = signupViewModel.registrationUIState.value.lastNameError
+                    )
                     MyTextFieldComponent(
                         labelValue = stringResource(id = R.string.email),
                         painterResource = painterResource(id = R.drawable.email),
                         onTextSelected = {
-                            loginViewModel.onEvent(LoginUIEvent.EmailChanged(it))
+                            signupViewModel.onEvent(SignupUIEvent.EmailChanged(it))
                         },
-                        errorStatus = loginViewModel.loginUIState.value.emailError
+                        errorStatus = signupViewModel.registrationUIState.value.emailError
                     )
-
                     PasswordTextFieldComponent(
                         labelValue = stringResource(id = R.string.password),
                         painterResource = painterResource(id = R.drawable.password),
                         onTextSelected = {
-                            loginViewModel.onEvent(LoginUIEvent.PasswordChanged(it))
+                            signupViewModel.onEvent(SignupUIEvent.PasswordChanged(it))
                         },
-                        errorStatus = loginViewModel.loginUIState.value.passwordError
+                        errorStatus = signupViewModel.registrationUIState.value.passwordError
                     )
-                    Spacer(modifier = Modifier.height(40.dp))
-
-                    UnderLinedTextComponenet(
-                        value = stringResource(id = R.string.forgot_password),
+                    CheckboxComponent(
+                        value = stringResource(id = R.string.terms_and_conditions),
                         onTextSelected = {
-                            HateDetectionAppRouter.navigateTo(Screen.ForgetPasswordScreen)
+                            HateDetectionAppRouter.navigateTo(Screen.TermsAndConditionsScreen)
+                        },
+                        onCheckedChange = {
+                            //loginViewModel.onEvent(UIEvent.PrivacyPolicyCheckBoxClicked(it))
                         }
                     )
 
-                    Spacer(modifier = Modifier.height(40.dp))
-
+                    Spacer(modifier = Modifier.height(80.dp))
                     ButtonComponent(
-                        value = stringResource(id = R.string.login),
+                        value = stringResource(id = R.string.register),
                         onButtonClicked = {
-                            loginViewModel.onEvent(LoginUIEvent.LoginButtonClicked)
+                            signupViewModel.onEvent(SignupUIEvent.RegisterButtonClicked)
                         },
-                        isEnabled = loginViewModel.allValidationsPassed.value
+                        isEnabled = signupViewModel.allValidationsPassed.value
                     )
                     Spacer(modifier = Modifier.height(20.dp))
 
                     DividerTextComponent()
-
                     ClickableLoginTextComponent(
-                        tryingToLogin = false,
+                        tryingToLogin = true,
                         onTextSelected = {
-                            HateDetectionAppRouter.navigateTo(Screen.SignUp)
+                            HateDetectionAppRouter.navigateTo(Screen.LoginScreen)
                         }
                     )
                 }
@@ -181,20 +191,14 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
         }
 
         // Loading indicator
-        if(loginViewModel.loginInProgress.value) {
+        if(signupViewModel.signUpProgress.value) {
             CircularProgressIndicator()
         }
     }
-
-    SystemBackButtonHandler {
-        HateDetectionAppRouter.navigateTo(Screen.SignUp)
-
-    }
-
 }
 
 @Preview
 @Composable
-fun LoginScreenPreview() {
-    LoginScreen()
+fun DefaultPreviewOfSignup() {
+    Signup()
 }

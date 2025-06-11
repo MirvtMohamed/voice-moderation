@@ -1,10 +1,8 @@
-package com.example.voice_moderation
+package com.example.voice_moderation.presentation.login
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.voice_moderation.data.LoginUIEvent
-import com.example.voice_moderation.data.LoginUIState
 import com.example.voice_moderation.data.rules.Validator
 import com.example.voice_moderation.navigation.HateDetectionAppRouter
 import com.example.voice_moderation.navigation.Screen
@@ -76,7 +74,7 @@ class LoginViewModel : ViewModel() {
 
                 if(it.isSuccessful){
 
-                    HateDetectionAppRouter.navigateTo(Screen.HomeScreen)
+                    HateDetectionAppRouter.navigateTo(Screen.MonitorScreen)
                 }
 
             }

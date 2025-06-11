@@ -1,4 +1,4 @@
-package com.example.voice_moderation.data
+package com.example.voice_moderation.presentation.signup
 
 
 sealed class SignupUIEvent {
@@ -8,5 +8,5 @@ sealed class SignupUIEvent {
     data class PasswordChanged(val password: String) : SignupUIEvent()
 
    // data class PrivacyPolicyCheckBoxClicked(val status:Boolean) : UIEvent()
-    object RegisterButtonClicked :SignupUIEvent()
+    object RegisterButtonClicked : SignupUIEvent()
 }

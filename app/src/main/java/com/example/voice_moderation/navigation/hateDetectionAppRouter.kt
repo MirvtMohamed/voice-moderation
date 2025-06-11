@@ -8,7 +8,8 @@ sealed class Screen {
     object TermsAndConditionsScreen : Screen()
     object LoginScreen : Screen()
     object ForgetPasswordScreen : Screen()
-    object HomeScreen :Screen()
+    // object HomeScreen :Screen() /
+    object MonitorScreen : Screen()
 }
 
 object HateDetectionAppRouter {
@@ -17,6 +18,6 @@ object HateDetectionAppRouter {
     var currentScreen: MutableState<Screen> = mutableStateOf(Screen.SignUp)
 
     fun navigateTo(destination: Screen) {
-        currentScreen.value = destination // Update the current screen
+        currentScreen.value = destination
     }
 }

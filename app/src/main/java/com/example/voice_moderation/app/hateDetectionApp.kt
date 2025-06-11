@@ -8,11 +8,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.voice_moderation.navigation.HateDetectionAppRouter
 import com.example.voice_moderation.navigation.Screen
-import com.example.voice_moderation.screens.ForgetPasswordScreen
-import com.example.voice_moderation.screens.HomeScreen
-import com.example.voice_moderation.screens.LoginScreen
-import com.example.voice_moderation.screens.Signup
-import com.example.voice_moderation.screens.TermsAndConditionsScreen
+import com.example.voice_moderation.presentation.forgetpassword.ForgetPasswordScreen
+import com.example.voice_moderation.presentation.login.LoginScreen
+import com.example.voice_moderation.presentation.monitor.MonitoringScreen
+import com.example.voice_moderation.presentation.signup.Signup
+import com.example.voice_moderation.presentation.termsandcondition.TermsAndConditionsScreen
 
 @Composable
 fun HateDetectionApp() {
@@ -20,7 +20,7 @@ fun HateDetectionApp() {
         modifier = Modifier.fillMaxSize(),
         color = Color.White
     ) {
-        Crossfade(targetState =  HateDetectionAppRouter.currentScreen, label = ""){ currentState ->
+        Crossfade(targetState =  HateDetectionAppRouter.currentScreen, label = "") { currentState ->
             when( currentState.value) {
                 is Screen.SignUp -> {
                     Signup()
@@ -33,13 +33,17 @@ fun HateDetectionApp() {
                 is Screen.LoginScreen ->{
                     LoginScreen()
                 }
-                is Screen.HomeScreen ->{
-                    HomeScreen()
+                // is Screen.HomeScreen ->{ // Comment out or remove this line
+                //    HomeScreen()
+                // }
+                is Screen.MonitorScreen ->{ // Add this new case
+                    MonitoringScreen() // Call your actual MonitorScreen Composable here
                 }
 
                 is Screen.ForgetPasswordScreen -> {
                     ForgetPasswordScreen()
                 }
-
-            }}
-    }}
+            }
+        }
+    }
+}

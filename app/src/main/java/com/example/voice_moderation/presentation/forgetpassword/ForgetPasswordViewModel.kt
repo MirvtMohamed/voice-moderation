@@ -1,4 +1,4 @@
-package com.example.voice_moderation.data
+package com.example.voice_moderation.presentation.forgetpassword
 
 import android.util.Patterns
 import androidx.lifecycle.ViewModel

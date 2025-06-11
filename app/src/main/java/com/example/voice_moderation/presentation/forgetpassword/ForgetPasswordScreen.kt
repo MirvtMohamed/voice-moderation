@@ -1,4 +1,4 @@
-package com.example.voice_moderation.screens
+package com.example.voice_moderation.presentation.forgetpassword
 
 import android.widget.Toast
 import androidx.compose.foundation.Canvas
@@ -26,8 +26,6 @@ import com.example.voice_moderation.components.ButtonComponent
 import com.example.voice_moderation.components.HeadingTextComponent
 import com.example.voice_moderation.components.MyTextFieldComponent
 import com.example.voice_moderation.components.NormalTextComponenet
-import com.example.voice_moderation.data.ForgetPasswordUIEvent
-import com.example.voice_moderation.data.ForgetPasswordViewModel
 import com.example.voice_moderation.navigation.HateDetectionAppRouter
 import com.example.voice_moderation.navigation.Screen
 

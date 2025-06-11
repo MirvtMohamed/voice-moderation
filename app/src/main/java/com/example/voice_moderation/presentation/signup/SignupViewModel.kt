@@ -1,4 +1,4 @@
-package com.example.voice_moderation.data
+package com.example.voice_moderation.presentation.signup
 
 
 
@@ -22,7 +22,7 @@ class SignupViewModel:ViewModel() {
     fun onEvent(event: SignupUIEvent){
         validateDataWithRules()
         when(event){
-            is SignupUIEvent.FirstNameChanged-> {
+            is SignupUIEvent.FirstNameChanged -> {
                 registrationUIState.value = registrationUIState.value.copy(
                     firstName = event.firstName
                 )
@@ -137,7 +137,7 @@ class SignupViewModel:ViewModel() {
                 signUpProgress.value = false
 
                 if(it.isSuccessful){
-                    HateDetectionAppRouter.navigateTo(Screen.HomeScreen)
+                    HateDetectionAppRouter.navigateTo(Screen.MonitorScreen)
                 }
             }
             .addOnFailureListener {
