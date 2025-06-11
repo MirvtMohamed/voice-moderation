@@ -1,4 +1,4 @@
-package com.example.voice_moderation.screens
+package com.example.voice_moderation.presentation.termsandcondition
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize

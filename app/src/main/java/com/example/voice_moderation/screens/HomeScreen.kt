@@ -15,11 +15,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.voice_moderation.R
 import com.example.voice_moderation.components.ButtonComponent
 import com.example.voice_moderation.components.HeadingTextComponent
-import com.example.voice_moderation.data.SignupViewModel
+import com.example.voice_moderation.presentation.signup.SignupViewModel
 
 
 @Composable
-fun HomeScreen(signupViewModel: SignupViewModel= viewModel()){
+fun HomeScreen(signupViewModel: SignupViewModel = viewModel()){
     Surface(
         modifier = Modifier
             .fillMaxSize()
