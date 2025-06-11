@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     id("kotlin-parcelize")
+    id("com.google.gms.google-services")
 
 }
 
@@ -89,7 +90,7 @@ dependencies {
 
 
     // optional - RxJava3 support
-   implementation(libs.androidx.datastore.preferences.rxjava3)
+    implementation(libs.androidx.datastore.preferences.rxjava3)
     implementation(libs.androidx.datastore.core)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.datastore.preferences.core)
@@ -108,4 +109,18 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation("com.google.android.gms:play-services-cast:21.0.1") // Use the latest version
+    implementation("com.google.android.material:material:1.8.0")
+    implementation("androidx.compose.material:material-icons-extended")
+
+
+    // Import the BoM for the Firebase platform
+    implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("androidx.biometric:biometric:1.1.0") // Use the latest version
+
+
+    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 }
