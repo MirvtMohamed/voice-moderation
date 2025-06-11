@@ -58,6 +58,9 @@ import com.example.voice_moderation.ui.theme.Purple40
 import com.example.voice_moderation.ui.theme.Purple80
 import com.example.voice_moderation.ui.theme.PurpleGrey40
 import androidx.compose.ui.Alignment.Companion as Alignment1
+import androidx.compose.material3.*
+import androidx.compose.material3.OutlinedTextFieldDefaults
+
 
 
 
@@ -111,7 +114,7 @@ fun MyTextFieldComponent(labelValue: String, painterResource: Painter,
             .fillMaxWidth()
             .clip(RoundedCornerShape(4.dp)),
         label = { Text(text = labelValue) },
-        colors = TextFieldDefaults.outlinedTextFieldColors(
+        colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Purple40,
             focusedLabelColor = Purple40,
             cursorColor = Purple40,
@@ -159,7 +162,7 @@ fun PasswordTextFieldComponent(labelValue: String, painterResource: Painter,
             .fillMaxWidth()
             .clip(RoundedCornerShape(4.dp)),
         label = { Text(text = labelValue) },
-        colors = TextFieldDefaults.outlinedTextFieldColors(
+        colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Purple40,
             focusedLabelColor = Purple40,
             cursorColor = Purple40,
