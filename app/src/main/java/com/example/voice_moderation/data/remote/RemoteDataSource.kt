@@ -1,6 +1,7 @@
 package com.example.voice_moderation.data.remote
 
 import com.example.voice_moderation.data.model.api.PredictionResponse
+import com.example.voice_moderation.data.model.api.SendEmailRequest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -20,6 +21,17 @@ class RemoteDataSource @Inject constructor(
             ApiResult.Success(response)
         } catch (e: Exception) {
             Timber.e(e, "Error analyzing audio")
+            ApiResult.Error(e)
+        }
+    }
+
+    // New method to send alert emails via the API
+    suspend fun sendAlertEmail(request: SendEmailRequest): ApiResult<Map<String, String>> {
+        return try {
+            val response = apiClient.monitoringApiService.sendAlertEmail(request)
+            ApiResult.Success(response)
+        } catch (e: Exception) {
+            Timber.e(e, "Error sending alert email")
             ApiResult.Error(e)
         }
     }

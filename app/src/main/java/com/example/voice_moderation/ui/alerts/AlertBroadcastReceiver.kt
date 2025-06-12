@@ -8,7 +8,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.example.voice_moderation.R
-import com.example.voice_moderation.domain.model.AudioAnalysisResult // Changed import
+import com.example.voice_moderation.domain.model.AudioAnalysisResult
 
 class AlertBroadcastReceiver : BroadcastReceiver() {
 
