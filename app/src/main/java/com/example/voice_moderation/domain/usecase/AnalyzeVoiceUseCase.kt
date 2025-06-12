@@ -29,9 +29,8 @@ class AnalyzeVoiceUseCase @Inject constructor(
 
                 // Logic to send alert based on severity and hate sensitivity
                 if (audioAnalysisResult.hateSpeechDetected || audioAnalysisResult.severityLevel > alertThresholdProvider.getThresholds().alertThreshold) {
-                    val message = "Voice chat alert: Hate speech detected or high severity level (${audioAnalysisResult.severityLevel}). Transcription: ${audioAnalysisResult.transcription}"
-                    // In a real app, the recipient email would come from user preferences or configuration
-                    alertSendingService.sendAlert(message, "parent@example.com")
+                    // The AlertSendingService now expects an AudioAnalysisResult object
+                    alertSendingService.sendAlert(audioAnalysisResult)
                 }
 
                 emit(ApiResult.Success(audioAnalysisResult))
@@ -83,3 +82,4 @@ class AnalyzeVoiceUseCase @Inject constructor(
         return severity
     }
 }
+

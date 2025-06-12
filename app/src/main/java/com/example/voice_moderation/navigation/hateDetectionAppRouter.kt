@@ -8,7 +8,6 @@ sealed class Screen {
     object TermsAndConditionsScreen : Screen()
     object LoginScreen : Screen()
     object ForgetPasswordScreen : Screen()
-    // object HomeScreen :Screen() /
     object MonitorScreen : Screen()
 }
 
