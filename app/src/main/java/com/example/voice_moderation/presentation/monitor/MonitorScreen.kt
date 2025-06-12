@@ -22,8 +22,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.voice_moderation.navigation.Screen
+import com.example.voice_moderation.presentation.splashscreen.SplashScreen
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -99,4 +102,9 @@ fun MonitoringScreen(
             }
         }
     }
+}
+@Preview
+@Composable
+fun MonitoringScreenPreview() {
+    MonitoringScreen()
 }
