@@ -7,6 +7,7 @@ import com.example.voice_moderation.data.audio.AudioProcessor
 import com.example.voice_moderation.data.audio.AudioStreamer
 import com.example.voice_moderation.domain.audio.AudioStreamController
 import com.example.voice_moderation.domain.usecase.AnalyzeVoiceUseCase
+import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,6 +38,13 @@ object AppModule {
         @ApplicationContext context: Context,
     ): AudioProcessor {
         return AudioProcessor(analyzeVoiceUseCase, context)
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideFirebaseAuth(): FirebaseAuth {
+        return FirebaseAuth.getInstance()
     }
 
     @Provides
