@@ -1,204 +1,278 @@
 package com.example.voice_moderation.presentation.signup
 
-import androidx.compose.foundation.Canvas
+import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.voice_moderation.components.HeadingTextComponent
-import com.example.voice_moderation.components.MyTextFieldComponent
-import com.example.voice_moderation.components.NormalTextComponenet
-import com.example.voice_moderation.components.PasswordTextFieldComponent
 import com.example.voice_moderation.R
-import com.example.voice_moderation.components.ButtonComponent
-import com.example.voice_moderation.components.CheckboxComponent
-import com.example.voice_moderation.components.ClickableLoginTextComponent
-import com.example.voice_moderation.components.DividerTextComponent
 import com.example.voice_moderation.navigation.HateDetectionAppRouter
 import com.example.voice_moderation.navigation.Screen
-
+import com.example.voice_moderation.presentation.components.ModernButton
+import com.example.voice_moderation.presentation.components.ModernCheckbox
+import com.example.voice_moderation.presentation.components.ModernPasswordTextField
+import com.example.voice_moderation.presentation.components.ModernTextField
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun Signup(signupViewModel: SignupViewModel = viewModel()) {
-    // Main container with white background
+    val scrollState = rememberScrollState()
+    val primaryColor = Color(0xFF38A8D2)
+    val uiState = signupViewModel.registrationUIState.value
+    val isSigningUp = signupViewModel.signUpProgress.value
+    val signupSuccess = signupViewModel.signupSuccess.value
+    val signupError = signupViewModel.signupError.value
+    val scope = rememberCoroutineScope()
+
+    // Animation visibility state
+    var isVisible by remember { mutableStateOf(false) }
+
+    // Snackbar host state for error messages
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Effect to navigate to MonitorScreen on successful signup
+    LaunchedEffect(signupSuccess) {
+        if (signupSuccess) {
+            // Show success message briefly before navigating
+            snackbarHostState.showSnackbar(
+                message = "Signup successful!",
+                duration = SnackbarDuration.Short
+            )
+            delay(1000) // Wait for 1 second to show the success message
+            HateDetectionAppRouter.navigateTo(Screen.MonitorScreen)
+        }
+    }
+
+    // Effect to show error message
+    LaunchedEffect(signupError) {
+        if (signupError != null) {
+            snackbarHostState.showSnackbar(
+                message = signupError,
+                duration = SnackbarDuration.Long
+            )
+        }
+    }
+
+    // Trigger animation after composition
+    LaunchedEffect(Unit) {
+        isVisible = true
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White),
-        contentAlignment = Alignment.Center
+            .background(Color.White)
     ) {
-        // Background decorative shapes
-        Canvas(
-            modifier = Modifier
-                .fillMaxSize()
-                .zIndex(0f)
-        ) {
-            // Top right decorative shape
-            val topRightPath = Path().apply {
-                moveTo(size.width * 0.65f, 0f)
-                quadraticBezierTo(
-                    size.width * 0.85f, size.height * 0.05f,
-                    size.width, size.height * 0.2f
-                )
-                lineTo(size.width, 0f)
-                close()
-            }
-
-            // Bottom left decorative shape
-            val bottomLeftPath = Path().apply {
-                moveTo(0f, size.height * 0.8f)
-                quadraticBezierTo(
-                    size.width * 0.15f, size.height * 0.95f,
-                    size.width * 0.35f, size.height
-                )
-                lineTo(0f, size.height)
-                close()
-            }
-
-            // Draw shapes with gradients
-            drawPath(
-                path = topRightPath,
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        Color(0xFF6B8AF2),
-                        Color(0xFF8BA4FF)
-                    ),
-                    start = Offset(size.width * 0.7f, 0f),
-                    end = Offset(size.width, size.height * 0.2f)
-                )
-            )
-
-            drawPath(
-                path = bottomLeftPath,
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        Color(0xFF8BA4FF),
-                        Color(0xFF6B8AF2)
-                    ),
-                    start = Offset(0f, size.height * 0.8f),
-                    end = Offset(size.width * 0.3f, size.height)
-                )
-            )
-        }
-
-        // Content container with padding
+        // Background gradient
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp)
-                .zIndex(1f),
-            contentAlignment = Alignment.Center
+                .fillMaxWidth()
+                .height(200.dp)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            primaryColor.copy(alpha = 0.7f),
+                            primaryColor.copy(alpha = 0.2f),
+                            Color.Transparent
+                        )
+                    )
+                )
+        )
+
+        // Content
+        AnimatedVisibility(
+            visible = isVisible,
+            enter = fadeIn(animationSpec = tween(1000)) +
+                    slideInVertically(animationSpec = tween(1000)) { it / 2 },
+            exit = fadeOut()
         ) {
-            // Main content surface
-            Surface(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(RoundedCornerShape(20.dp)),
-                color = Color.White,
-                shadowElevation = 2.dp
+                    .padding(24.dp)
+                    .verticalScroll(scrollState),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Main content column
-                Column(
+                Spacer(modifier = Modifier.height(40.dp))
+
+                // App logo or icon
+                Image(
+                    painter = painterResource(id = R.drawable.parental_control),
+                    contentDescription = "App Logo",
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(24.dp)
+                        .size(100.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(primaryColor.copy(alpha = 0.1f))
+                        .padding(16.dp)
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Title
+                Text(
+                    text = "Create Account",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+
+                Text(
+                    text = "Sign up to get started with Voice Moderation",
+                    fontSize = 16.sp,
+                    color = Color.Gray,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Form fields
+                ModernTextField(
+                    value = uiState.firstName,
+                    onValueChange = { signupViewModel.onEvent(SignupUIEvent.FirstNameChanged(it)) },
+                    label = "First Name",
+                    leadingIconVector = Icons.Default.Person,
+                    isError = uiState.firstNameError,
+                    errorMessage = "Please enter a valid first name"
+                )
+
+                ModernTextField(
+                    value = uiState.lastName,
+                    onValueChange = { signupViewModel.onEvent(SignupUIEvent.LastNameChanged(it)) },
+                    label = "Last Name",
+                    leadingIconVector = Icons.Default.Person,
+                    isError = uiState.lastNameError,
+                    errorMessage = "Please enter a valid last name"
+                )
+
+                ModernTextField(
+                    value = uiState.email,
+                    onValueChange = { signupViewModel.onEvent(SignupUIEvent.EmailChanged(it)) },
+                    label = "Email",
+                    leadingIconVector = Icons.Default.Email,
+                    isError = uiState.emailError,
+                    errorMessage = "Please enter a valid email address",
+                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Email
+                )
+
+                ModernPasswordTextField(
+                    value = uiState.password,
+                    onValueChange = { signupViewModel.onEvent(SignupUIEvent.PasswordChanged(it)) },
+                    label = "Password",
+                    leadingIcon = painterResource(id = R.drawable.password),
+                    isError = uiState.passwordError,
+                    errorMessage = "Password must be at least 8 characters with letters, numbers & symbols"
+                )
+
+                // Terms and conditions checkbox
+                ModernCheckbox(
+                    text = "I agree to the Terms and Conditions",
+                    isChecked = uiState.privacyPolicyAccepted,
+                    onCheckedChange = {
+                        Log.d("SignupScreen", "Checkbox state changed to: $it")
+                        signupViewModel.onEvent(SignupUIEvent.PrivacyPolicyCheckBoxClicked(it))
+                    },
+                    onTextClick = { HateDetectionAppRouter.navigateTo(Screen.TermsAndConditionsScreen) }
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                // Sign up button
+                ModernButton(
+                    text = "SIGN UP",
+                    onClick = { signupViewModel.onEvent(SignupUIEvent.RegisterButtonClicked) },
+                    enabled = signupViewModel.allValidationsPassed.value,
+                    isLoading = isSigningUp
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Divider
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Spacer(modifier = Modifier.height(20.dp))
-                    NormalTextComponenet(value = stringResource(id = R.string.hello))
-                    HeadingTextComponent(value = stringResource(id = R.string.create_account))
-
-                    MyTextFieldComponent(
-                        labelValue = stringResource(id = R.string.first_name),
-                        painterResource = painterResource(id = R.drawable.profile),
-                        onTextSelected = {
-                            signupViewModel.onEvent(SignupUIEvent.FirstNameChanged(it))
-                        },
-                        errorStatus = signupViewModel.registrationUIState.value.firstNameError
+                    Divider(
+                        modifier = Modifier.weight(1f),
+                        color = Color.LightGray
                     )
-                    MyTextFieldComponent(
-                        labelValue = stringResource(id = R.string.last_name),
-                        painterResource = painterResource(id = R.drawable.profile),
-                        onTextSelected = {
-                            signupViewModel.onEvent(SignupUIEvent.LastNameChanged(it))
-                        },
-                        errorStatus = signupViewModel.registrationUIState.value.lastNameError
+                    Text(
+                        text = "OR",
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        color = Color.Gray,
+                        fontSize = 14.sp
                     )
-                    MyTextFieldComponent(
-                        labelValue = stringResource(id = R.string.email),
-                        painterResource = painterResource(id = R.drawable.email),
-                        onTextSelected = {
-                            signupViewModel.onEvent(SignupUIEvent.EmailChanged(it))
-                        },
-                        errorStatus = signupViewModel.registrationUIState.value.emailError
-                    )
-                    PasswordTextFieldComponent(
-                        labelValue = stringResource(id = R.string.password),
-                        painterResource = painterResource(id = R.drawable.password),
-                        onTextSelected = {
-                            signupViewModel.onEvent(SignupUIEvent.PasswordChanged(it))
-                        },
-                        errorStatus = signupViewModel.registrationUIState.value.passwordError
-                    )
-                    CheckboxComponent(
-                        value = stringResource(id = R.string.terms_and_conditions),
-                        onTextSelected = {
-                            HateDetectionAppRouter.navigateTo(Screen.TermsAndConditionsScreen)
-                        },
-                        onCheckedChange = {
-                            //loginViewModel.onEvent(UIEvent.PrivacyPolicyCheckBoxClicked(it))
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(80.dp))
-                    ButtonComponent(
-                        value = stringResource(id = R.string.register),
-                        onButtonClicked = {
-                            signupViewModel.onEvent(SignupUIEvent.RegisterButtonClicked)
-                        },
-                        isEnabled = signupViewModel.allValidationsPassed.value
-                    )
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    DividerTextComponent()
-                    ClickableLoginTextComponent(
-                        tryingToLogin = true,
-                        onTextSelected = {
-                            HateDetectionAppRouter.navigateTo(Screen.LoginScreen)
-                        }
+                    Divider(
+                        modifier = Modifier.weight(1f),
+                        color = Color.LightGray
                     )
                 }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Login link
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Already have an account?",
+                        color = Color.Gray,
+                        fontSize = 14.sp
+                    )
+                    TextButton(onClick = { HateDetectionAppRouter.navigateTo(Screen.LoginScreen) }) {
+                        Text(
+                            text = "Log In", // Fixed text parameter
+                            color = primaryColor,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
             }
         }
 
-        // Loading indicator
-        if(signupViewModel.signUpProgress.value) {
-            CircularProgressIndicator()
-        }
+        // Snackbar host for error messages
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp)
+        )
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-fun DefaultPreviewOfSignup() {
+fun SignupPreview() {
     Signup()
 }
+

@@ -1,4 +1,4 @@
-package com.example.voice_moderation.ui.alerts
+package com.example.voice_moderation.presentation.alerts
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

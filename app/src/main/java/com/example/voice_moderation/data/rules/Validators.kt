@@ -1,15 +1,11 @@
 package com.example.voice_moderation.data.rules
 
-import android.util.Log
-
 object Validator {
-
 
     fun validateFirstName(fName: String): ValidationResult {
         return ValidationResult(
             (!fName.isNullOrEmpty() && fName.length >= 2)
         )
-
     }
 
     fun validateLastName(lName: String): ValidationResult {
@@ -20,24 +16,22 @@ object Validator {
 
     fun validateEmail(email: String): ValidationResult {
         return ValidationResult(
-            (!email.isNullOrEmpty())
+            (!email.isNullOrEmpty() && email.contains("@"))
         )
     }
 
     fun validatePassword(password: String): ValidationResult {
         return ValidationResult(
-            (!password.isNullOrEmpty() && password.length >= 4)
+            (!password.isNullOrEmpty() && password.length >= 6)
         )
     }
 
-   /* fun validatePrivacyPolicyAcceptance(statusValue:Boolean):ValidationResult{
+    fun validatePrivacyPolicyAcceptance(statusValue: Boolean): ValidationResult {
         return ValidationResult(
             statusValue
         )
-    }*/
-
+    }
 }
 
-data class ValidationResult(
-    val status: Boolean = false
-)
+data class ValidationResult(val status: Boolean = false)
+
