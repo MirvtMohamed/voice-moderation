@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HateDetectionApp</string>
+    <string name="app_name">KinderVoice</string>
     <string name="hello">Hey there, </string>
     <string name="create_account">Create an account</string>
     <string name="welcome">Welcome back 👋</string>
