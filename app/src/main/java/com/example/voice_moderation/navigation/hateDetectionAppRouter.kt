@@ -4,6 +4,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 
 sealed class Screen {
+    object SplashScreen : Screen()
     object SignUp : Screen()
     object TermsAndConditionsScreen : Screen()
     object LoginScreen : Screen()
@@ -13,8 +14,7 @@ sealed class Screen {
 
 object HateDetectionAppRouter {
 
-
-    var currentScreen: MutableState<Screen> = mutableStateOf(Screen.SignUp)
+    var currentScreen: MutableState<Screen> = mutableStateOf(Screen.SplashScreen) // Change initial screen to SplashScreen
 
     fun navigateTo(destination: Screen) {
         currentScreen.value = destination

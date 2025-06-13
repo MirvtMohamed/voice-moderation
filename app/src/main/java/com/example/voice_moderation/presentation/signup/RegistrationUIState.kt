@@ -1,17 +1,15 @@
 package com.example.voice_moderation.presentation.signup
 
-
 data class RegistrationUIState(
-    var firstName: String = "",
-    var lastName: String = "",
-    var email: String = "",
-    var password: String = "",
-   // var privacyPolicyAccepted: Boolean = false,
+    val firstName: String = "",
+    val lastName: String = "",
+    val email: String = "",
+    val password: String = "",
+    val privacyPolicyAccepted: Boolean = false, // Added this field
 
-
-    var firstNameError: Boolean = false,
-    var lastNameError: Boolean = false,
-    var emailError: Boolean = false,
-    var passwordError: Boolean = false,
-   // var privacyPolicyError: Boolean = false
+    val firstNameError: Boolean = false,
+    val lastNameError: Boolean = false,
+    val emailError: Boolean = false,
+    val passwordError: Boolean = false,
+    val privacyPolicyError: Boolean = false // Added this field
 )

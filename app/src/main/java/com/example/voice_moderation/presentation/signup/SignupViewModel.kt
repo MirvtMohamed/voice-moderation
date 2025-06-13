@@ -1,7 +1,5 @@
 package com.example.voice_moderation.presentation.signup
 
-
-
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -18,65 +16,85 @@ class SignupViewModel:ViewModel() {
     var registrationUIState = mutableStateOf(RegistrationUIState())
     var allValidationsPassed = mutableStateOf(false)
     var signUpProgress = mutableStateOf(false)
+    var signupSuccess = mutableStateOf(false) // New state for success feedback
+    var signupError = mutableStateOf<String?>(null) // New state for error feedback
 
     fun onEvent(event: SignupUIEvent){
-        validateDataWithRules()
         when(event){
             is SignupUIEvent.FirstNameChanged -> {
                 registrationUIState.value = registrationUIState.value.copy(
                     firstName = event.firstName
                 )
-                printState()
-
             }
 
             is SignupUIEvent.LastNameChanged ->{
                 registrationUIState.value = registrationUIState.value.copy(
                     lastName = event.lastName
                 )
-                printState()
             }
 
             is SignupUIEvent.EmailChanged ->{
                 registrationUIState.value = registrationUIState.value.copy(
                     email = event.email
                 )
-                printState()
             }
 
             is SignupUIEvent.PasswordChanged ->{
                 registrationUIState.value = registrationUIState.value.copy(
                     password = event.password
                 )
-                printState()
             }
-            is SignupUIEvent.RegisterButtonClicked ->{
-                signUp()
-            }
-
-           /* is UIEvent.PrivacyPolicyCheckBoxClicked ->{
+            is SignupUIEvent.PrivacyPolicyCheckBoxClicked -> {
                 registrationUIState.value = registrationUIState.value.copy(
                     privacyPolicyAccepted = event.status
                 )
-
-
-            }*/
-
-
-
+            }
+            is SignupUIEvent.RegisterButtonClicked ->{
+                validateDataWithRules()
+                if (allValidationsPassed.value) {
+                    signUp()
+                }
+            }
         }
-
-
+        // Always validate after any event to update validation status
+        validateDataWithRules()
+        printState()
     }
 
     private fun signUp() {
         Log.d(TAG,"Inside_signUp")
         printState()
-        createUserInFirebase(
-            email = registrationUIState.value.email,
-            password = registrationUIState.value.password
-        )
+        signUpProgress.value = true
+        signupError.value = null // Clear previous errors
+        signupSuccess.value = false // Reset success state
 
+        FirebaseAuth
+            .getInstance()
+            .createUserWithEmailAndPassword(
+                registrationUIState.value.email,
+                registrationUIState.value.password
+            )
+            .addOnCompleteListener {
+                Log.d(TAG,"Inside_OnCompleteListener")
+                Log.d(TAG,"isSuccessful = ${it.isSuccessful}")
+                signUpProgress.value = false
+
+                if(it.isSuccessful){
+                    signupSuccess.value = true
+                    // Navigate after a short delay to show success feedback
+                    // HateDetectionAppRouter.navigateTo(Screen.MonitorScreen) // This navigation will be handled by UI after success feedback
+                } else {
+                    signupError.value = it.exception?.localizedMessage ?: "An unknown error occurred."
+                }
+            }
+            .addOnFailureListener {
+                Log.d(TAG,"Inside_OnFailureListener")
+                Log.d(TAG,"Exception = ${it.message}")
+                Log.d(TAG,"Exception = ${it.localizedMessage}")
+
+                signUpProgress.value = false
+                signupError.value = it.localizedMessage ?: "An unknown error occurred."
+            }
     }
 
     private fun validateDataWithRules() {
@@ -92,62 +110,31 @@ class SignupViewModel:ViewModel() {
         val passwordResult = Validator.validatePassword(
             password = registrationUIState.value.password
         )
-
-       /* val privacyPolicyResult = Validator.validatePrivacyPolicyAcceptance(
+        val privacyPolicyResult = Validator.validatePrivacyPolicyAcceptance(
             statusValue = registrationUIState.value.privacyPolicyAccepted
-        )*/
+        )
+
         Log.d(TAG, "Inside_validateDataWithRules")
         Log.d(TAG, "fNameResult= $fNameResult")
         Log.d(TAG, "lNameResult= $lNameResult")
         Log.d(TAG, "emailResult= $emailResult")
         Log.d(TAG, "passwordResult= $passwordResult")
-       // Log.d(TAG, "privacyPolicyResult= $privacyPolicyResult")
+        Log.d(TAG, "privacyPolicyResult= $privacyPolicyResult")
 
         registrationUIState.value = registrationUIState.value.copy(
-            firstNameError = fNameResult.status,
-            lastNameError = lNameResult.status,
-            emailError = emailResult.status,
-            passwordError = passwordResult.status,
-           // privacyPolicyError = privacyPolicyResult.status
+            firstNameError = !fNameResult.status, // Inverted logic
+            lastNameError = !lNameResult.status,   // Inverted logic
+            emailError = !emailResult.status,     // Inverted logic
+            passwordError = !passwordResult.status, // Inverted logic
+            privacyPolicyError = !privacyPolicyResult.status // Inverted logic
         )
         allValidationsPassed.value= fNameResult.status && lNameResult.status &&
-            emailResult.status && passwordResult.status
-               // && privacyPolicyResult.status
-
-
-
-        }
-
-
+                emailResult.status && passwordResult.status && privacyPolicyResult.status
+    }
 
     private fun printState(){
         Log.d(TAG,"Inside_printState")
         Log.d(TAG,registrationUIState.value.toString())
-    }
-
-    private fun createUserInFirebase(email:String, password:String){
-        signUpProgress.value = true
-
-        FirebaseAuth
-            .getInstance()
-            .createUserWithEmailAndPassword(email,password)
-            .addOnCompleteListener {
-                Log.d(TAG,"Inside_OnCompleteListener")
-                Log.d(TAG,"isSuccessful = ${it.isSuccessful}")
-                signUpProgress.value = false
-
-                if(it.isSuccessful){
-                    HateDetectionAppRouter.navigateTo(Screen.MonitorScreen)
-                }
-            }
-            .addOnFailureListener {
-                Log.d(TAG,"Inside_OnFailureListener")
-                Log.d(TAG,"Exception = ${it.message}")
-                Log.d(TAG,"Exception = ${it.localizedMessage}")
-
-            }
-
-
     }
 
     fun logout(){
@@ -158,11 +145,11 @@ class SignupViewModel:ViewModel() {
                 Log.d(TAG,"Inside sign out outsuccess")
                 HateDetectionAppRouter.navigateTo(Screen.LoginScreen)
 
-        }else{
-            Log.d(TAG,"Inside sign out is not complete")
-        }
+            }else{
+                Log.d(TAG,"Inside sign out is not complete")
+            }
 
-    }
+        }
         firebaseAuth.addAuthStateListener (authStateListener)
     }
 
